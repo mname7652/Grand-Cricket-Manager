@@ -26,6 +26,8 @@ jobs:
         run: |
           npx cap add android
           node patch-manifest.js
+          pip install pillow
+          python3 make-icons.py
           npx cap sync android
       - name: Build release APK
         run: cd android && chmod +x gradlew && ./gradlew assembleRelease
