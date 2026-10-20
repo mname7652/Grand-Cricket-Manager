@@ -3899,7 +3899,7 @@ function daily(){refreshMissions();const st=drNext();
  <div class="card"><b>📺 Free coins</b><div class="mut">+5 coins per ad · ${adLeft()} left today</div><button class="btn b" onclick="adCoins('daily')">Watch ad</button></div>${nav('Home')}`)}
 
 /* Real AdMob rewarded ad (Capacitor app). In a browser, or if the plugin is missing, the old placeholder popup is used. */
-const ADMOB_REWARDED='ca-app-pub-8099683504953883/1479010221',ADMOB_TEST=true;/* set ADMOB_TEST=false only for the final Play Store build */
+const ADMOB_REWARDED='ca-app-pub-8099683504953883/1479010221',ADMOB_TEST=false;/* false = real ads. Set true to get safe test ads while testing on your own phone */
 let _adInit=0,_adBusy=0;
 async function showAd(cb){
  const C=window.Capacitor,A=C&&C.Plugins&&C.Plugins.AdMob,nat=!!(C&&C.isNativePlatform&&C.isNativePlatform());
