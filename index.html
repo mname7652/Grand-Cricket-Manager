@@ -3898,7 +3898,27 @@ function daily(){refreshMissions();const st=drNext();
  ${S.ms.list.map((x,i)=>`<div class="card"><div class="pl"><b>${x.t}</b><span class="gold"><i class="pkcn">G</i>${x.c} · $${x.m}M</span></div><div class="bar" style="margin:8px 0"><b style="width:${x.p/x.g*100}%"></b></div><div class="pl"><span class="mut">${x.p}/${x.g}</span><button class="btn ${x.cl?'':'g'}" style="width:auto;margin:0;padding:8px 14px" ${x.p>=x.g&&!x.cl?'':'disabled'} onclick="claimM(${i})">${x.cl?'Claimed':'Claim'}</button></div></div>`).join('')}
  <div class="card"><b>📺 Free coins</b><div class="mut">+5 coins per ad · ${adLeft()} left today</div><button class="btn b" onclick="adCoins('daily')">Watch ad</button></div>${nav('Home')}`)}
 
-function showAd(cb){
+/* Real AdMob rewarded ad (Capacitor app). In a browser, or if the plugin is missing, the old placeholder popup is used. */
+const ADMOB_REWARDED='ca-app-pub-8099683504953883/1479010221',ADMOB_TEST=true;/* set ADMOB_TEST=false only for the final Play Store build */
+let _adInit=0,_adBusy=0;
+async function showAd(cb){
+ const C=window.Capacitor,A=C&&C.Plugins&&C.Plugins.AdMob,nat=!!(C&&C.isNativePlatform&&C.isNativePlatform());
+ if(!nat||!A)return showAdFake(cb);
+ if(_adBusy)return;_adBusy=1;
+ let got=0;const hs=[];
+ try{
+  if(!_adInit){await A.initialize({initializeForTesting:ADMOB_TEST});_adInit=1}
+  let fin;const done=new Promise(r=>fin=r);
+  hs.push(await A.addListener('onRewardedVideoAdReward',()=>{got=1}));
+  hs.push(await A.addListener('onRewardedVideoAdDismissed',()=>fin()));
+  hs.push(await A.addListener('onRewardedVideoAdFailedToShow',()=>fin()));
+  await A.prepareRewardVideoAd({adId:ADMOB_REWARDED,isTesting:ADMOB_TEST});
+  await A.showRewardVideoAd();
+  await done;
+ }catch(e){toast('Ad not available right now. Try again in a minute.')}
+ hs.forEach(h=>{try{h.remove()}catch(e){}});_adBusy=0;
+ if(got)cb()}
+function showAdFake(cb){
  const o=document.createElement('div');o.style.cssText='position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,.85);z-index:99;display:grid;place-items:center;padding:20px';let n=5;
  o.innerHTML=`<div class="card" style="width:100%;max-width:340px;text-align:center"><b class="gold">📺 Sponsored</b><div class="mut" style="margin:8px 0">Ad placeholder. Connect a rewarded ad SDK (AdMob) inside showAd() to show real ads.</div><div class="big" id="adc">${n}</div><button class="btn" id="adx" disabled>Please wait…</button><button class="btn" id="adk">Close</button></div>`;
  document.body.appendChild(o);
