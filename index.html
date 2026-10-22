@@ -1911,7 +1911,7 @@ function helpComp(){helpPage('🏆 Competitions',
  'League, World Championship and international cups.','🏆')}
 function helpMgr(){helpPage('👔 Manager career',
  `<div class="hq">You are not only managing a team, you are building your <b>own career as a manager</b>.</div>`+
- hP([['🧑‍💼','Board goal','Every season the board sets a goal. A strong club may need the league title. A smaller club may only need a top 6 finish.'],['✅','Meet the goal','Board confidence goes up and your club\'s reputation grows.'],['❌','Miss the goal','Confidence drops and your club\'s reputation falls. Be careful, you may be sacked.'],['💼','Job office','Good managers receive job offers from other clubs. You can accept one and move.'],['👔','My profile','Your manager record, ranking and history.'],['🌍','International Career','After each World Championship, national boards may invite top managers to manage their team at the T20 International World Cup.']])+
+ hP([['🧑‍💼','Board goal','Every season the board sets a goal. A strong club may need the league title. A smaller club may only need a top 6 finish.'],['✅','Meet the goal','Board confidence goes up and your club\'s reputation grows.'],['❌','Miss the goal','Confidence drops and your club\'s reputation falls. Be careful, you may be sacked.'],['💼','Job office','Good managers receive job offers from other clubs. You can accept one and move.'],['👔','My profile','Your manager record, ranking and history.'],['🌍','International Career','After each World Championship, national boards may invite top managers to manage their team at the T20 International World Cup.'],['🎁','National job rewards','Manager rating points (+3 to +40), a cash prize for your club ($1M to $15M), and club reputation (+1 to +4) that brings more fans and better sponsors. Meet the chairman\'s goal for extra coins.']])+
  hN('Open <b>Job office</b> often. A blinking button means a new offer is waiting.'),
  'Goals, jobs and your reputation.','👔')}
 function helpDaily(){helpPage('🎁 Daily &amp; coins',
@@ -2251,7 +2251,7 @@ function lgCollect(c,list){const map={},mine=c==S.country,mr=(n,st)=>st&&st.m>0?
    S.sq.forEach(p=>{const st=sn==S.season?p.st:(p.sh||[]).find(x=>x.sn==sn&&(x.c==S.club||x.c==S.orig)),e=mr(p.n,st);if(e)lgMerge(map,'m:'+p.n,e,{me:1})});
    if(sn!=S.season&&S.pool)S.pool.forEach(t=>{const sh=t[17];if(!sh||!sh.length)return;const st=sh.find(x=>x.sn==sn&&(x.c==S.club||x.c==S.orig)),e=st&&mr(pn(t),st);if(e)lgMerge(map,'m:'+pn(t),e,{me:1,pi:S.pool.indexOf(t)})})}});
  return Object.keys(map).map(k=>map[k])}
-function lgClk(x){const e=x.e;let a='';if(x.me){const mi=S.sq.findIndex(p=>p.n===e[0]);if(mi>=0)a=`PBK1='lgStats()';player(${mi})`;else if(x.pi!==undefined)a=`tProfile(${x.pi},'lgStats()')`}else if(x.pi!==undefined)a=`tProfile(${x.pi},'lgStats()')`;return a?`style="cursor:pointer" onclick="${a}"`:''}
+function lgClk(x){const e=x.e;let a='';if(x.me){const mi=S.sq.findIndex(p=>p.n===e[0]);const bk=LG.club?'clubStats()':'lgStats()';if(mi>=0)a=`PBK1='${bk}';player(${mi})`;else if(x.pi!==undefined)a=`tProfile(${x.pi},'${bk}')`}else if(x.pi!==undefined)a=`tProfile(${x.pi},'${LG.club?'clubStats()':'lgStats()'}')`;return a?`style="cursor:pointer" onclick="${a}"`:''}
 function lgBat(){const L=LG.B,s=LG.bs,n=Math.min(LG.nb,L.length);
  const rows=L.slice(0,n).map((x,i)=>{const e=x.e;return `<tr class="${x.me?'my':''}" ${lgClk(x)}><td>${i+1}</td><td class="pn">${esc(e[0])}<small>${esc(e[1])}</small></td><td>${e[2]}</td><td><b>${e[5]}</b></td><td>${e[7]}</td><td>${x.avg.toFixed(1)}</td><td style="padding-right:5px">${x.sr.toFixed(0)}</td></tr>`}).join('');
  return `<div class="pl" style="margin:12px 0 5px"><b style="white-space:nowrap">🏏 Batting</b><select class="lsel" onchange="LG.bs=this.value;LG.nb=10;lgRefB()"><option value="r" ${s=='r'?'selected':''}>Most runs</option><option value="avg" ${s=='avg'?'selected':''}>Best average</option><option value="sr" ${s=='sr'?'selected':''}>Best strike rate</option></select></div>`+
@@ -2278,6 +2278,62 @@ function lgStats(){const c=LG.c,sn=LG.sn,all=sn==0,seasons=lgSeasons(),from=c==S
   if((top&&top.s>0)||ch)box=`<div class="grid" style="margin-top:12px">${top&&top.s>0?`<div class="card" style="margin:0;border-color:var(--gold);padding:9px 10px"><div class="mut" style="font-size:11px">Player of the season</div><b class="nm" style="font-size:14px">${esc(top.x.e[0])}</b></div>`:'<div></div>'}${ch?`<div class="card" style="margin:0;padding:9px 10px"><div class="mut" style="font-size:11px">${ch[0]}</div><b class="nm" style="font-size:14px">${esc(ch[1])}</b></div>`:'<div></div>'}</div>`}
  set(`${back(from)}<h2>${FLAG[c]||''} ${esc(c)} league</h2><div class="tg"><button class="btn" style="margin:0;text-align:center" onclick="${from}">Table</button><button class="btn sel" style="margin:0;text-align:center">Stats</button></div>${chips}`+
   (LG.all.length?`<div id="lgb">${lgBat()}</div><div id="lgw">${lgBowl()}</div>${box}<div class="mut" style="font-size:11px;margin-top:10px">Stats of the last 5 seasons are kept. Tap any player to open his profile.</div>`:`<div class="card mut" style="text-align:center">No matches played in this season yet. Stats appear after the first round.</div>`))}
+function clubStatsOpen(){LG={c:S.country,sn:S.season,bs:'r',ws:'w',nb:10,nw:10,B:[],W:[],club:1};clubStats()}
+function clubPick(sn){LG.sn=sn;LG.nb=10;LG.nw=10;clubStats()}
+function clubStats(){LG.club=1;LG.c=S.country;const sn=LG.sn,all=sn==0,seasons=lgSeasons();
+ LG.all=lgCollect(S.country,all?seasons.slice().reverse():[sn]).filter(x=>x.me);lgSort();
+ const chips=`<div class="pl" style="margin:12px 0 5px"><b style="white-space:nowrap">📅 Season</b><select class="lsel" style="flex:1;margin-left:10px;font-size:14px;padding:7px 10px" onchange="clubPick(+this.value)">${seasons.map(x=>`<option value="${x}" ${x==sn?'selected':''}>Season ${x}${x==S.season?' · running':''}</option>`).join('')}${seasons.length>1?`<option value="0" ${all?'selected':''}>All seasons</option>`:''}</select></div>`;
+ const sum=k=>LG.all.reduce((t,x)=>t+(x.e[k]||0),0),tile=(l,v)=>`<div class="card stat" style="margin:0;padding:10px 6px"><span>${v}</span><small>${l}</small></div>`;
+ set(`${back('clubStatus()')}<h2>📊 Club statistics</h2><div class="mut" style="font-size:12px;margin:0 2px">${esc(S.club)} players only</div>${chips}`+
+  (LG.all.length?`<div class="grid3" style="gap:8px;margin-top:8px">${tile('Runs',sum(5))}${tile('Wickets',sum(10))}${tile('50s / 100s',sum(8)+' / '+sum(9))}</div><div id="lgb">${lgBat()}</div><div id="lgw">${lgBowl()}</div><div class="mut" style="font-size:11px;margin-top:10px">Stats of the last 5 seasons are kept. Tap any player to open his profile.</div>`:`<div class="card mut" style="text-align:center">No matches played for your club in this season yet. Stats appear after the first round.</div>`))}
+/* ---------- Club record book, Man of the Match log, injury report, season reviews ---------- */
+function mlAdd(A,B,won,tie,mo){const mi=A.bt.name==S.club?A:B,oi=mi===A?B:A;S.ml=S.ml||[];
+ S.ml.push({sn:S.season,rd:S.round+1,opp:oi.bt.name,won:won?1:0,tie:tie?1:0,r:mi.runs,w:mi.w,or:oi.runs,ow:oi.w,mr:won&&mi===A?mi.runs-oi.runs:0,mw:won&&mi===B?10-B.w:0,mn:mo?mo.p.n:'',me:mo&&mo.me?1:0});
+ if(S.ml.length>400)S.ml.shift()}
+function ilAdd(p,d){S.il=S.il||[];S.il.push({sn:S.season,rd:S.round+1,n:p.n,t:p.injT||'Injury',d});if(S.il.length>300)S.il.shift()}
+let CRT='rec';
+function clubRecs(t){if(t)CRT=t;const ML=S.ml||[],hd=(a,b)=>`<div class="pl" style="padding:7px 0;border-top:1px solid #12306a"><span style="min-width:0"><b class="nm">${a}</b></span><b class="gold" style="flex:none;text-align:right">${b}</b></div>`,
+ tabs=`<div class="fchips cc" style="justify-content:flex-start">${[['rec','🏆 Team records'],['mom','⭐ Man of the Match']].map(c=>`<button class="fch${CRT==c[0]?' on':''}" style="padding:8px 11px;font-size:13px" onclick="clubRecs('${c[0]}')">${c[1]}</button>`).join('')}</div>`;let h='';
+ if(!ML.length)h=`<div class="card mut" style="text-align:center;line-height:1.6">No matches recorded yet. Play a match and the record book starts filling. Records are kept for your last 400 matches.</div>`;
+ else if(CRT=='rec'){
+  const best=(f,cmp)=>ML.reduce((a,x)=>(!a||cmp(f(x),f(a)))?x:a,null),hi=best(x=>x.r,(a,b)=>a>b),lo=best(x=>x.r,(a,b)=>a<b),hc=best(x=>x.or,(a,b)=>a>b),bw=best(x=>x.mr,(a,b)=>a>b),bk=best(x=>x.mw,(a,b)=>a>b),
+  W=ML.filter(x=>x.won).length,T=ML.filter(x=>x.tie).length,L=ML.length-W-T;let cur=0,ws=0,ub=0,cu=0;ML.forEach(x=>{if(x.won){cur++;ws=Math.max(ws,cur)}else cur=0;if(!x.won&&!x.tie){cu=0}else{cu++;ub=Math.max(ub,cu)}});
+  let cw=0;for(let i=ML.length-1;i>=0&&ML[i].won;i--)cw++;
+  const vs=x=>x?'vs '+esc(x.opp)+' · S'+x.sn:'',sc=(r,w)=>r+'/'+w;
+  h=`<div class="grid3" style="gap:8px;margin-bottom:8px"><div class="card stat" style="margin:0"><span class="grn">${W}</span><small>Won</small></div><div class="card stat" style="margin:0"><span class="red">${L}</span><small>Lost</small></div><div class="card stat" style="margin:0"><span class="gold">${T}</span><small>Tied</small></div></div>`+
+  `<div class="card"><b>Team records</b>${hd('🔥 Longest winning streak<div class="mut" style="font-size:12px;font-weight:400">'+(cw>0?'Current streak: '+cw:'No current streak')+'</div>',ws)}${hd('🛡 Longest unbeaten run',ub)}${hi?hd('💥 Highest total<div class="mut" style="font-size:12px;font-weight:400">'+vs(hi)+'</div>',sc(hi.r,hi.w)):''}${lo?hd('📉 Lowest total<div class="mut" style="font-size:12px;font-weight:400">'+vs(lo)+'</div>',sc(lo.r,lo.w)):''}${hc?hd('😬 Highest total conceded<div class="mut" style="font-size:12px;font-weight:400">'+vs(hc)+'</div>',sc(hc.or,hc.ow)):''}${bw&&bw.mr>0?hd('🏏 Biggest win (batting first)<div class="mut" style="font-size:12px;font-weight:400">'+vs(bw)+'</div>','by '+bw.mr+' runs'):''}${bk&&bk.mw>0?hd('🎯 Biggest win (chasing)<div class="mut" style="font-size:12px;font-weight:400">'+vs(bk)+'</div>','by '+bk.mw+' wkts'):''}</div>`+
+  `<button class="btn b" onclick="CHT='rec';clubHistory()">📜 Player records and club history ›</button><div class="card mut" style="font-size:12px">Team records count from the first match played with this version. Player records are in Club history.</div>`}
+ else{const by={};ML.filter(x=>x.me).forEach(x=>{by[x.mn]=(by[x.mn]||0)+1});const lb=Object.keys(by).sort((a,b)=>by[b]-by[a]),log=ML.filter(x=>x.me).slice().reverse().slice(0,30),opp=ML.filter(x=>!x.me&&x.mn).length;
+  h=(lb.length?`<div class="card"><b>⭐ Most Man of the Match awards</b>${lb.slice(0,10).map((n,i)=>hd((i+1)+'. '+esc(n),by[n])).join('')}</div>`:'')+
+  (log.length?`<div class="card"><b>Recent awards</b><div class="mut" style="font-size:12px;margin:2px 0 4px">Your players only (${ML.filter(x=>x.me).length} of ${ML.length} matches${opp?', the other '+opp+' went to opponents':''}).</div>${log.map(x=>hd(esc(x.mn)+'<div class="mut" style="font-size:12px;font-weight:400">Season '+x.sn+' · round '+x.rd+' · vs '+esc(x.opp)+' · '+(x.won?'won':x.tie?'tied':'lost')+' '+x.r+'/'+x.w+' - '+x.or+'/'+x.ow+'</div>','⭐')).join('')}</div>`:`<div class="card mut" style="text-align:center">None of your players has won Man of the Match since this log started.</div>`)}
+ set(`${back('clubStatus()')}<h2>🏆 Record book</h2>${tabs}${h}`)}
+function injReport(){const hd=(a,b)=>`<div class="pl" style="padding:7px 0;border-top:1px solid #12306a"><span style="min-width:0"><b class="nm">${a}</b></span><b style="flex:none;text-align:right">${b}</b></div>`,
+ sq=S.sq.map((p,i)=>{ext(p);return{p,i}}),out=sq.filter(x=>x.p.inj>0).sort((a,b)=>b.p.inj-a.p.inj),tired=sq.filter(x=>!(x.p.inj>0)&&(x.p.str===undefined?100:x.p.str)<70).sort((a,b)=>a.p.str-b.p.str),
+ xi=S.sq.slice(0,11),fit=xi.length?Math.round(xi.reduce((t,p)=>t+(p.str===undefined?100:p.str),0)/xi.length):100,IL=S.il||[],cs=IL.filter(x=>x.sn==S.season),by={};IL.forEach(x=>{by[x.n]=(by[x.n]||0)+1});
+ const pr=Object.keys(by).sort((a,b)=>by[b]-by[a]).slice(0,5),tile=(l,v,c)=>`<div class="card stat" style="margin:0;padding:10px 6px"><span class="${c||''}">${v}</span><small>${l}</small></div>`,go=i=>`PBK1='injReport()';player(${i})`;
+ set(`${back('clubStatus()')}<h2>🩺 Injury &amp; fitness</h2><div class="grid3" style="gap:8px">${tile('Injured now',out.length,out.length?'red':'grn')}${tile('XI fitness',fit+'%',fit<70?'red':fit<85?'gold':'grn')}${tile('This season',cs.length+' inj.')}</div>`+
+  `<div class="card"><b>🤕 Injured now</b>${out.length?out.map(x=>`<div class="pl" style="padding:7px 0;border-top:1px solid #12306a;cursor:pointer" onclick="${go(x.i)}"><span style="min-width:0"><b class="nm">${esc(x.p.n)}</b><div class="mut" style="font-size:12px">${esc(x.p.injT||'Injury')}</div></span><b class="red" style="flex:none">${x.p.inj} round${x.p.inj>1?'s':''}</b></div>`).join(''):'<div class="mut" style="margin-top:6px">Nobody is injured.</div>'}</div>`+
+  `<div class="card"><b>😮‍💨 Tired players</b><div class="mut" style="font-size:12px;margin:2px 0 4px">Under 70% fitness. Rest them for a match, or play them less in a row.</div>${tired.length?tired.slice(0,10).map(x=>`<div class="pl" style="padding:7px 0;border-top:1px solid #12306a;cursor:pointer" onclick="${go(x.i)}"><span style="min-width:0"><b class="nm">${esc(x.p.n)}</b><div class="mut" style="font-size:12px">${x.i<11?'In your XI':'On the bench'}</div></span><b class="${x.p.str<50?'red':'gold'}" style="flex:none">${Math.round(x.p.str)}%</b></div>`).join(''):'<div class="mut" style="margin-top:6px">Everyone is fresh.</div>'}</div>`+
+  (pr.length?`<div class="card"><b>📋 Most injuries</b>${pr.map(n=>hd(esc(n),by[n]+'x')).join('')}</div>`:'')+
+  (IL.length?`<div class="card"><b>History</b><div class="mut" style="font-size:12px;margin:2px 0 4px">Rounds missed this season: ${cs.reduce((t,x)=>t+x.d,0)}</div>${IL.slice().reverse().slice(0,12).map(x=>hd(esc(x.n)+'<div class="mut" style="font-size:12px;font-weight:400">'+esc(x.t)+' · Season '+x.sn+' · round '+x.rd+'</div>',x.d+' rd')).join('')}</div>`:'<div class="card mut" style="font-size:12px">Injuries are recorded from your next match.</div>'))}
+let SRV=0;
+function srLive(){const rows=S.teams.map(t=>({n:t.name,...S.tbl[t.name]})).sort((a,b)=>b.pts-a.pts||b.w-a.w||nrr(b)-nrr(a)),m=S.tbl[S.club]||{},L=S.sq.filter(p=>p.st&&p.st.m>0),top=k=>L.slice().sort((a,b)=>(b.st[k]||0)-(a.st[k]||0))[0],tb=top('r'),tw=top('w');
+ return{sn:S.season,club:S.club,pos:rows.findIndex(r=>r.n==S.club)+1,np:S.teams.length,pts:m.pts||0,w:m.w||0,l:m.l||0,t:m.t||0,champ:0,live:1,bat:tb&&tb.st.r>0?[tb.n,tb.st.r]:null,bowl:tw&&tw.st.w>0?[tw.n,tw.st.w]:null,form:(S.hist||[]).filter(h=>h.sn===S.season&&h.u).map(h=>h.won?'W':/tied/i.test(h.line)?'T':'L').join('')}}
+function seasonReviews(sn){if(sn!==undefined)SRV=sn;const A=(S.arch||[]).filter(a=>a.club===S.club||true),ss=[S.season].concat(A.map(a=>a.sn).filter(x=>x!==S.season).sort((a,b)=>b-a));if(!ss.includes(SRV))SRV=S.season;
+ const R=SRV==S.season?srLive():A.find(a=>a.sn==SRV),ML=(S.ml||[]).filter(x=>x.sn==SRV),IL=(S.il||[]).filter(x=>x.sn==SRV),hd=(a,b)=>`<div class="pl" style="padding:7px 0;border-top:1px solid #12306a"><span style="min-width:0"><b class="nm">${a}</b></span><b class="gold" style="flex:none;text-align:right">${b}</b></div>`;
+ const sel=`<div class="pl" style="margin:12px 0 5px"><b style="white-space:nowrap">📅 Season</b><select class="lsel" style="flex:1;margin-left:10px;font-size:14px;padding:7px 10px" onchange="seasonReviews(+this.value)">${ss.map(x=>`<option value="${x}" ${x==SRV?'selected':''}>Season ${x}${x==S.season?' · running':''}</option>`).join('')}</select></div>`;
+ if(!R)return set(`${back('clubStatus()')}<h2>📰 Season review</h2>${sel}<div class="card mut">No review for this season.</div>`);
+ const wins=ML.filter(x=>x.won),bw=ML.reduce((a,x)=>x.mr>(a?a.mr:0)?x:a,null),bk=ML.reduce((a,x)=>x.mw>(a?a.mw:0)?x:a,null),hi=ML.reduce((a,x)=>(!a||x.r>a.r)?x:a,null),by={};ML.filter(x=>x.me).forEach(x=>{by[x.mn]=(by[x.mn]||0)+1});const mo=Object.keys(by).sort((a,b)=>by[b]-by[a])[0],
+  goalTxt=R.live?'':(R.champ?'League champions 🏆':'Finished #'+R.pos+' of '+R.np),mny=v=>'$'+Math.round(v)+'M';
+ set(`${back('clubStatus()')}<h2>📰 Season review</h2>${sel}`+
+ `<div class="card" style="border-color:${R.champ?'var(--gold)':'#1c4a8f'};text-align:center"><div class="mut" style="font-size:12px">${esc(R.club)} · Season ${R.sn}${R.live?' · running':''}</div><div class="big ${R.champ?'gold':''}" style="margin:4px 0">${R.live?'#'+R.pos+' now':R.champ?'🏆 Champions':'#'+R.pos}</div><div class="mut" style="font-size:13px">${R.w}W ${R.l}L ${R.t}T · ${R.pts} pts${R.np?' · '+R.np+' clubs':''}</div>${R.form?`<div class="fm" style="margin-top:8px">${R.form.split('').map(c=>`<i class="${c}">${c}</i>`).join('')}</div>`:''}${R.wc?`<div style="margin-top:8px;font-size:13px">${esc(R.wc)}</div>`:''}</div>`+
+ ((R.bat||R.bowl||mo||(R.mo&&R.mo[0]))?`<div class="card"><b>⭐ Star performers</b>${R.bat?hd('🏏 '+esc(R.bat[0])+'<div class="mut" style="font-size:12px;font-weight:400">Top run-scorer</div>',R.bat[1]):''}${R.bowl?hd('🎯 '+esc(R.bowl[0])+'<div class="mut" style="font-size:12px;font-weight:400">Top wicket-taker</div>',R.bowl[1]):''}${mo?hd('⭐ '+esc(mo)+'<div class="mut" style="font-size:12px;font-weight:400">Most Man of the Match</div>',by[mo]):(R.mo?hd('⭐ '+esc(R.mo[0])+'<div class="mut" style="font-size:12px;font-weight:400">Most Man of the Match</div>',R.mo[1]):'')}</div>`:'')+
+ (ML.length?`<div class="card"><b>📊 Match highlights</b>${hi?hd('💥 Highest total<div class="mut" style="font-size:12px;font-weight:400">vs '+esc(hi.opp)+'</div>',hi.r+'/'+hi.w):''}${bw&&bw.mr>0?hd('🏏 Biggest win batting first<div class="mut" style="font-size:12px;font-weight:400">vs '+esc(bw.opp)+'</div>','by '+bw.mr+' runs'):''}${bk&&bk.mw>0?hd('🎯 Biggest win chasing<div class="mut" style="font-size:12px;font-weight:400">vs '+esc(bk.opp)+'</div>','by '+bk.mw+' wkts'):''}${hd('✅ Matches won',wins.length+' of '+ML.length)}</div>`:'')+
+ (IL.length||ML.length?`<div class="card"><b>🩺 Injuries</b>${hd(IL.length+' injur'+(IL.length==1?'y':'ies'),IL.reduce((t,x)=>t+x.d,0)+' rounds missed')}</div>`:'')+
+ (R.aw&&R.aw.length?`<div class="card" style="border-color:var(--gold)"><b>🏅 Awards won</b>${R.aw.map(a=>`<div style="font-size:13px;margin-top:4px">${esc(a)}</div>`).join('')}</div>`:'')+
+ (!R.live&&R.inc!==undefined?`<div class="card"><b>💰 Money</b><div class="grid3" style="gap:6px;margin-top:8px"><div class="card stat" style="margin:0">${mny(R.inc)}<small>Income</small></div><div class="card stat" style="margin:0">${mny(R.exp)}<small>Spent</small></div><div class="card stat" style="margin:0"><span class="${R.inc-R.exp>=0?'grn':'red'}">${R.inc-R.exp>=0?'+':'-'}${mny(Math.abs(R.inc-R.exp))}</span><small>Net</small></div></div></div>`:'')+
+ (R.ms&&R.ms.length?`<div class="card" style="border-color:var(--gold)"><b>🎉 Milestones</b>${R.ms.map(x=>{const m=MST.find(z=>z[0]===x.k);return m?hd(m[1]+' '+esc(x.n),m[2]):''}).join('')}</div>`:'')+
+ `<div class="card mut" style="font-size:12px">Match highlights and injuries are recorded from the first match played with this version. Older seasons show their saved review.</div>`)}
 function worldChamp(){CLK=[];CVB='worldChamp()';
  const W=S.wc&&S.wc.sn==S.season?S.wc:null,H=(S.wcHist||[]).slice().reverse(),T={};(S.wcHist||[]).forEach(x=>T[x.country]=(T[x.country]||0)+1);
  let h=`${back('home()')}<h2>🏆 World Championship</h2><div class="card" style="border-color:var(--gold)"><b class="gold">World Championship</b><div class="mut" style="margin-top:4px">The top 2 clubs of every nation play the cup at the end of each season.</div>${S.wcTitles?`<div class="grn" style="margin-top:6px">Your club has won it ${S.wcTitles} time${S.wcTitles>1?'s':''} 🌍</div>`:''}</div>`;
@@ -2298,8 +2354,8 @@ function clubView(n){ensureWT();const mine=n===S.club,pf=PROF[n]||(mine?PROF[S.o
  else Object.keys(S.wt.t).forEach(c=>{if(S.wt.t[c][n]){rows=tblRows(S.wt.t[c]);country=c;const w=S.world[c].find(t=>t.name==n);st=w&&w.s}});
  const pos=rows?rows.findIndex(r=>r.n==n):-1,rec=rows&&rows[pos];CVC="clubView('"+n+"')";
  const L=[];
- if(mine)S.sq.forEach((p,i)=>{ext(p);L.push({o:ovr(p),role:p.role,nm:p.n,age:p.age,bt:p.bt,bat:p.bat,bowl:p.bowl,ic:trIc(p),star:p.star,xi:i<11,p:p,go:'player('+i+')'})});
- else if(ci!==undefined&&S.pool)pIdx(ci).forEach(i=>{const t=S.pool[i],p=toObj(t);L.push({o:tOvr(t),role:p.role,nm:p.n,age:p.age,bt:p.bt,bat:p.bat,bowl:p.bowl,ic:trIc(p),star:isStar(t),p:p,go:'tProfile('+i+',CVC)'})});
+ if(mine)S.sq.forEach((p,i)=>{ext(p);L.push({o:ovr(p),role:p.role,nm:p.n,age:p.age,bt:p.bt,bat:p.bat,bowl:p.bowl,fld:p.fld,ic:trIc(p),star:p.star,xi:i<11,p:p,go:'player('+i+')'})});
+ else if(ci!==undefined&&S.pool)pIdx(ci).forEach(i=>{const t=S.pool[i],p=toObj(t);L.push({o:tOvr(t),role:p.role,nm:p.n,age:p.age,bt:p.bt,bat:p.bat,bowl:p.bowl,fld:p.fld,ic:trIc(p),star:isStar(t),p:p,go:'tProfile('+i+',CVC)'})});
  L.sort((a,b)=>b.o-a.o);
  const best=L[0],d=(a,b)=>`<div class="pl" style="padding:4px 0"><span class="mut">${a}</span><b>${b}</b></div>`,T=pf&&TIERS[pf.t],mgr=(()=>{try{ensureMr();const m=S.mr.list.find(x=>x.c===(mine?S.orig:n));return m?d('👔 Manager',`<span class="gold" style="cursor:pointer;text-decoration:underline" onclick="mgrProfile(${m.id},CVC)">${esc(m.name)}</span>`):''}catch(e){return ''}})();
  const fin=mine?'$'+S.cash.toFixed(1)+'M cash':(S.cb&&ci!==undefined&&S.cb[ci]!==undefined?'$'+Math.round(S.cb[ci])+'M budget':'-');
@@ -2403,9 +2459,9 @@ function jobGen(){ensureBoard();const M=ensureMr(),me=M.list.find(x=>x.me),rk=(M
  S.jo={sn:S.season+1,list};S.jv={sn:S.season+1,list:(M.sk||[]).filter(k=>k!==S.orig)};S.jap={};
  if(list.length)ntf('💼 Job office: '+list.length+' club'+(list.length>1?'s want':' wants')+' to hire you')}
 const jobNew=()=>!!((S.jo&&S.jo.list.some(o=>!o.seen))||(S.nj&&S.nj.list&&S.nj.list.some(o=>!o.seen)));
-function jobChance(c){const M=ensureMr(),me=M.list.find(x=>x.me),rk=(M.pr&&M.pr[me.id])||80,T='ABCD',d=T.indexOf(PROF[c].t)-T.indexOf(PROF[S.orig].t);
- return cl(Math.round((.5*(1-(rk-1)/79)+(me.ti>0?.1:0)+(S.bc>=60?.1:0)+d*.12)*100),5,90)/100}
-function jobApply(c){ensureBoard();if(S.jap[c])return;const ok=Math.random()<jobChance(c);S.jap[c]=ok?'ok':'no';
+function jobChance(c){const M=ensureMr(),me=M.list.find(x=>x.me),rk=(M.pr&&M.pr[me.id])||80,T='ABCD',d=T.indexOf(PROF[c].t)-T.indexOf(PROF[S.orig].t),vc=!!(S.jv&&S.jv.list&&S.jv.list.indexOf(c)>=0);
+ return cl(Math.round((.5*(1-(rk-1)/79)+(me.ti>0?.1:0)+(S.bc>=60?.1:0)+d*.12-(vc?0:.1))*100),4,90)/100}
+function jobApply(c){ensureBoard();if(!c||c===S.orig||S.jap[c]||(S.jo&&S.jo.list.some(o=>o.c===c)))return;const ok=Math.random()<jobChance(c);S.jap[c]=ok?'ok':'no';
  if(ok){S.jo=S.jo||{sn:S.season,list:[]};if(!S.jo.list.some(o=>o.c===c))S.jo.list.push({c,seen:1,ap:1})}
  save();toast(ok?c+' want to hire you. See your offers':c+' chose another manager');jobOffice()}
 /* ---------- club switching: mid-season scouting, locked accept, switchClub ---------- */
@@ -2478,6 +2534,14 @@ function switchClub(nk,ph){
  nws('👔 '+me.name+' left '+oldName+' and joined '+nk+'. '+(cur?cur.name:'A new manager')+' took over at '+ok,'me');mnews('mg','👔 '+me.name+' left '+oldName+' and joined '+nk+'. '+(cur?cur.name:'A new manager')+' took over at '+ok);
  S.swc=(S.swc||0)+1;save();return true}
 function jobDecline(i){if(!S.jo)return;const o=S.jo.list[i];if(o&&S.jp&&S.jp.c===o.c)S.jp=null;S.jo.list.splice(i,1);save();jobOffice()}
+let JOPEN='';
+function allClubsHtml(head,offers,vac){
+ const skip=new Set([S.orig].concat(vac,offers.map(o=>o.c))),cs=Object.keys(CL);
+ return `<div class="gold" style="font-weight:800;margin:14px 2px 4px">🌍 All clubs</div><div class="mut" style="font-size:12px;margin:0 2px 8px">Apply to any club in the world. Clubs with a manager are harder to get than vacant jobs. One application per club each season.</div>`+
+ cs.map(co=>{const L=CL[co].map(x=>x.n).filter(n=>!skip.has(n));if(!L.length)return '';
+  const rows=L.map(c=>{const ap=S.jap[c],ch=Math.round(jobChance(c)*100);
+   return `<div class="card mrow">${head(c)}${ap=='no'?'<div class="red" style="margin-top:6px">Rejected. They chose another manager.</div>':`<button class="btn b" onclick="JOPEN=CLK[${ck(co)}];jobApply(CLK[${ck(c)}])">Apply · ${ch}% chance</button>`}</div>`}).join('');
+  return `<details ${JOPEN===co?'open':''} style="margin:6px 0"><summary class="card" style="cursor:pointer;list-style:none;margin:0"><b>${FLAG[co]||''} ${esc(co)}</b> <span class="mut" style="font-size:12px">· ${L.length} clubs ▾</span></summary>${rows}</details>`}).join('')}
 function jobOffice(){ensureBoard();const M=ensureMr();CLK=[];const me=M.list.find(x=>x.me),all=mgrSorted(),rk=all.findIndex(x=>x.m===me)+1,L=bcLv(S.bc),g=goalPos(),pos=bcMy(),
  bcol=S.bc>=50?'#19c37d':S.bc>=30?'#f5c542':'#ff4d6d';
  if(S.jo)S.jo.list.forEach(o=>o.seen=1);save();
@@ -2491,8 +2555,10 @@ function jobOffice(){ensureBoard();const M=ensureMr();CLK=[];const me=M.list.fin
  njBox(rk)+`<div class="gold" style="font-weight:800;margin:14px 2px 4px">🪑 Vacant jobs</div>`+
  (vac.length?vac.map(c=>{const ap=S.jap[c],ch=Math.round(jobChance(c)*100),cur=M.list.find(x=>x.c===c);
   return `<div class="card mrow">${head(c)}<div class="mut" style="font-size:12px;margin-top:4px">Manager sacked. Caretaker: ${esc(cur?cur.name:'-')}</div>${ap=='ok'?'<div class="grn" style="margin-top:6px">Selected! Check your offers.</div>':ap=='no'?'<div class="red" style="margin-top:6px">Rejected. They chose another manager.</div>':`<button class="btn b" onclick="jobApply(CLK[${ck(c)}])">Apply · ${ch}% chance</button>`}</div>`}).join(''):`<div class="card mut">No club is looking for a manager now. Vacancies appear when a board sacks its manager at the end of a season.</div>`)+
+ allClubsHtml(head,offers,vac)+
  (S.bh.length?`<div class="card"><b>Board record</b>${S.bh.slice().reverse().map(x=>`<div class="pl mut" style="padding:3px 0;font-size:13px"><span>Season ${x.sn} · goal ${goalTxt(x.g).toLowerCase()}</span><span class="${x.met?'grn':'red'}">#${x.pos} ${x.met?'✓':'✗'}</span></div>`).join('')}</div>`:''))}
 /* ---------- national team jobs (offered after the T20 International World Cup) ---------- */
+const NPRZ=[1,4,8,15],NREP=[0,1,2,4];/* national job reward by stage: cash prize in $M and club reputation (reputation raises fans and sponsor offers) */
 const NWP=[3,12,22,40];/* manager rating points for the user's national job: group / semi / runner-up / champions */
 const NJG=['Win the T20 International World Cup','Reach the semi final','Win 3 group matches'],NJT=['Top nation','Mid nation','Low nation'],NJC=['#f5c542','#2a9bff','#19c3a0'];
 function ensureNJ(){if(!S.nj)S.nj={sn:0,list:[]};if(S.nm===undefined)S.nm=null;if(S.nm&&S.nbc===undefined)S.nbc=60;if(!S.nh)S.nh=[]}
@@ -2510,6 +2576,7 @@ function natGoalMet(t,c,N){const st=N.stage[c]||0,w=(N.tbl[c]||{}).w||0;return t
 function natBoardSeason(){ensureNJ();const nm=S.nm;if(!nm||S.season<nm.sn||nm.done===S.season)return;const N=ncRun(),c=nm.nat;if(!N||N.sn!=S.season||N.stage[c]===undefined)return;
  nm.done=S.season;const st=N.stage[c],met=natGoalMet(nm.t,c,N),before=S.nbc;
  if(st==3){nm.nt=(nm.nt||0)+1;S.ntt=(S.ntt||0)+1;ntf('🏆 You won the T20 International World Cup with '+c+'!')}
+ {const pz=NPRZ[st]||0,rp=NREP[st]||0;S.cash+=pz;S.rep=Math.min(99,(S.rep||0)+rp);ntf('🌍 National job: +$'+pz+'M prize'+(rp?' · club reputation +'+rp+' (more fans &amp; better sponsors)':''))}
  if(met){S.nbc=Math.min(100,S.nbc+15+(st==3&&nm.t>0?10:0));const cn=nm.t==0?15:nm.t==1?10:6;S.coins=(S.coins||0)+cn;S.cash+=Math.round(cn/2);ntf('🌍 '+c+' chairman: goal met ('+nm.g+'). +'+cn+' coins')}
  else{S.nbc=Math.max(0,S.nbc-(st==0?25:15));ntf('🌍 '+c+' chairman: goal missed ('+nm.g+')')}
  S.nh.push({sn:S.season,nat:c,g:nm.g,st,met,nbc:S.nbc});if(S.nh.length>10)S.nh.shift();
@@ -2524,7 +2591,7 @@ function natInvite(){ensureNJ();const M=ensureMr(),me=M.list.find(x=>x.me),rk=(M
  for(let k=0;k<n&&pool.length;k++){const best=pool.filter(c=>natTier(c)==tiers[0]),c=rk<=10&&best.length&&Math.random()<.7?pick(best):pick(pool);
   pool.splice(pool.indexOf(c),1);S.nj.list.push({c,t:natTier(c),seen:0})}
  if(S.nj.list.length)ntf('🌍 '+S.nj.list.map(o=>o.c).join(' & ')+(S.nj.list.length>1?' boards want':' board wants')+' you as national team manager');save()}
-function njInv(L){return L.map((o,i)=>`<div class="card mrow" style="border-color:${NJC[o.t]}"><div class="pl"><b>${NCNM(o.c)}</b><span style="font-size:12px;color:${NJC[o.t]}">${NJT[o.t]}</span></div><div class="mut" style="font-size:12px;margin-top:4px">🎯 Chairman's goal: <b>${NJG[o.t]}</b> · no fixed contract · part-time</div><div class="grid" style="margin-top:6px"><button class="btn g" onclick="njConfirm(${i})">Accept</button><button class="btn" onclick="njDecline(${i})">Decline</button></div></div>`).join('')}
+function njInv(L){return L.map((o,i)=>`<div class="card mrow" style="border-color:${NJC[o.t]}"><div class="pl"><b>${NCNM(o.c)}</b><span style="font-size:12px;color:${NJC[o.t]}">${NJT[o.t]}</span></div><div class="mut" style="font-size:12px;margin-top:4px">🎯 Chairman's goal: <b>${NJG[o.t]}</b> · no fixed contract · part-time</div><div class="mut" style="font-size:12px;margin-top:4px">🎁 Rewards: manager rating points, $1M–$15M prize for your club, club reputation +1 to +4 (more fans &amp; sponsors)</div><div class="grid" style="margin-top:6px"><button class="btn g" onclick="njConfirm(${i})">Accept</button><button class="btn" onclick="njDecline(${i})">Decline</button></div></div>`).join('')}
 function intlTeams(N){const L=rankList();
  return `<div class="card"><b>👔 National team managers</b><div class="mut" style="font-size:12px;margin:2px 0 6px">${N?'Every nation, its manager and how far it went':'Every nation, its manager and its world rating'}</div>`+L.map((c,i)=>{const mine=S.nm&&S.nm.nat==c,mg=mine?S.mgr:natMgr(c).name;
   return `<div class="pl" style="padding:6px 0;border-top:1px solid #12306a;${mine?'color:var(--gold)':''}"><span style="min-width:0"><b>${i+1}. ${FLAG[c]||''} ${esc(c)}</b><div class="mut nm" style="font-size:11px">👔 ${natMgrLink(c,'intlCup()')}</div></span><span class="mut" style="font-size:12px;text-align:right;flex:none">${N?NCSTG[N.stage[c]||0]+(N.champ==c?' 🏆':''):rating(c)}</span></div>`}).join('')+`</div>`}
@@ -2558,7 +2625,7 @@ function nbcBar(){const v=S.nbc===undefined?60:S.nbc,col=v>=60?'var(--green)':v>
 function njBox(rk){ensureNJ();const nm=S.nm,L=S.nj.list;L.forEach(o=>o.seen=1);save();
  return `<div class="gold" style="font-weight:800;margin:14px 2px 4px">🌍 National team jobs</div>`+
  (nm?`<div class="card" style="border-color:${NJC[nm.t]}"><div class="pl"><b>${NCNM(nm.nat)}</b><span class="mut" style="font-size:12px">${NJT[nm.t]}</span></div><div class="mut" style="font-size:12px;margin-top:4px">🎯 Goal: <b>${nm.g}</b> · since season ${nm.sn} · no fixed contract</div><div class="mut" style="font-size:12px">Part-time: you manage them at the T20 International World Cup.</div>${nbcBar()}<button class="btn b" onclick="njTeam()">🌍 Manage squad &amp; tactics</button><button class="btn" onclick="njResign()">Resign</button></div>`:'')+
- (L.length?(nm?'<div class="mut" style="font-size:12px;margin:6px 2px">📨 Offers from other nations. Accept one to leave '+esc(nm.nat)+' and join them.</div>':'')+L.map((o,i)=>`<div class="card mrow" style="border-color:${NJC[o.t]}"><div class="pl"><b>${NCNM(o.c)}</b><span style="font-size:12px;color:${NJC[o.t]}">${NJT[o.t]}</span></div><div class="mut" style="font-size:12px;margin-top:4px">🎯 Chairman's goal: <b>${NJG[o.t]}</b> · no fixed contract · part-time</div><div class="grid" style="margin-top:6px"><button class="btn g" onclick="njConfirm(${i})">Accept</button><button class="btn" onclick="njDecline(${i})">Decline</button></div></div>`).join(''):'')+
+ (L.length?(nm?'<div class="mut" style="font-size:12px;margin:6px 2px">📨 Offers from other nations. Accept one to leave '+esc(nm.nat)+' and join them.</div>':'')+L.map((o,i)=>`<div class="card mrow" style="border-color:${NJC[o.t]}"><div class="pl"><b>${NCNM(o.c)}</b><span style="font-size:12px;color:${NJC[o.t]}">${NJT[o.t]}</span></div><div class="mut" style="font-size:12px;margin-top:4px">🎯 Chairman's goal: <b>${NJG[o.t]}</b> · no fixed contract · part-time</div><div class="mut" style="font-size:12px;margin-top:4px">🎁 Rewards: manager rating points, $1M–$15M prize for your club, club reputation +1 to +4 (more fans &amp; sponsors)</div><div class="grid" style="margin-top:6px"><button class="btn g" onclick="njConfirm(${i})">Accept</button><button class="btn" onclick="njDecline(${i})">Decline</button></div></div>`).join(''):'')+
  (!nm&&!L.length?`<div class="card mut">${rk>40?'National boards only hire the top 40 managers. You are #'+rk+'.':(S.nsk&&S.season<S.nsk?'You were sacked recently. National boards will not hire you for a couple of seasons.':'No national offers right now. Boards invite the top managers after the World Championship.')}</div>`:'')}
 /* ---------- national job: squad + tactics control ---------- */
 let NJSEL='',NJF='',NJSQ=[],NJCD=[];
@@ -2609,6 +2676,10 @@ function clubStatus(){
  set(`<div class="csh"><button class="bk" onclick="home()">‹</button>${I.crown}<div class="ln"><span></span><h1>Club <b>Status</b></h1><span></span></div></div>
  <div class="csb"><div class="cr">${crestL(S.logo,S.club,0)}<div class="leg">Build Your Legacy</div></div><div class="ci"><h2>Club Status</h2>${row('users','Squad strength',strength(S.sq))}${row('cal','Season record',t.w+'W '+t.l+'L '+t.t+'T')}${row('cash','Cash','$'+S.cash.toFixed(1)+'M')}${row('shield','Reputation',S.rep)}${row('star','Club value',(()=>{try{const m=crkMet(S.club),sc=cvScore(m);return sc+'/100 · '+cvFans(sc)+'M fans'}catch(e){return '-'}})())}${row('star','Star player',esc(best.n)+' ('+ovr(best)+')')}</div></div>
  ${act('#2a9bff','list','cup','Results','View match results &amp; performance','results()')}
+ ${act('#14b8c4','list','cup','Club statistics','Your club players: runs, wickets, all seasons','clubStatsOpen()')}
+ ${act('#f5a623','medal','laurel','Record book','Team records and Man of the Match log','clubRecs()')}
+ ${act('#e0334f','shield','std','Injury &amp; fitness','Injured, tired and injury-prone players','injReport()')}
+ ${act('#2a9bff','cal','cup','Season review','Review any season of your club','seasonReviews()')}
  ${act('#9b5cff','medal','laurel','Season awards','Check your awards &amp; achievements','awards(1)')}
  ${act('#19c3a0','logo','shd','Change club logo','Set a new club logo','logoEdit()')}
  ${act('#f5a623','pen','std','Rename club','Give your club a new name','renameClub()')}`)}
@@ -3294,7 +3365,7 @@ function finish2(A,B,win,txt){
   crkMatch(na,nb,x>y?na:nb);upd(na,x>y,0);upd(nb,y>x,0);nrrAdd(T,na,nb,x,120,y,120);lgMatch(S.country,na,x,nb,y);S.hist.push({sn:S.season,rd:S.round+1,line:`${na} ${x} vs ${nb} ${y} — ${x>y?na:nb} won`,u:0})});
  ensureWT();while(S.wt.r<=S.round)simWT();
  const base=won?BI(2):tie?BI(1):BI(0),gate=gateInc(),sp=sponInc(won),inc=base+gate+sp,wage=+wageBill().toFixed(2);finTrack();S.cash+=inc-wage;finMatch(inc,wage);S.rep=Math.max(0,S.rep+(won?2:tie?0:-1));
- const mo=motmCalc(A,B,win);if(mo&&mo.me){const q=ext(mo.p).st;q.mo=(q.mo||0)+1;ntf('⭐ '+mo.p.n+' was Man of the Match')}const wo=winOpen(S.round+1);statsUpd();missionEvent(won);S.round++;afterMatch();try{boardMatch(won,tie)}catch(e){}try{jobScout()}catch(e){}transferRound(wo);S.teams[0].s=strength(S.sq);
+ const mo=motmCalc(A,B,win);try{mlAdd(A,B,won,tie,mo)}catch(e){}if(mo&&mo.me){const q=ext(mo.p).st;q.mo=(q.mo||0)+1;ntf('⭐ '+mo.p.n+' was Man of the Match')}const wo=winOpen(S.round+1);statsUpd();missionEvent(won);S.round++;afterMatch();try{boardMatch(won,tie)}catch(e){}try{jobScout()}catch(e){}transferRound(wo);S.teams[0].s=strength(S.sq);
  formDrift();
  const fmd=fmAfter(won,tie);M.res={won,tie,inc,fm:fmd,fmv:fmGet(),base,gate,sp,wage,mo:mo&&{n:mo.p.n,c:mo.c,me:mo.me},txt:tie?'Match tied!':`${win.name} ${txt}`};save()}
 
@@ -3901,8 +3972,16 @@ function daily(){refreshMissions();const st=drNext();
 /* Real AdMob rewarded ad (Capacitor app). In a browser, or if the plugin is missing, the old placeholder popup is used. */
 const ADMOB_REWARDED='ca-app-pub-8099683504953883/1479010221',ADMOB_TEST=false;/* false = real ads. Set true to get safe test ads while testing on your own phone */
 let _adInit=0,_adBusy=0;
+/* index.html is a single file with no @capacitor/core runtime, so Capacitor.Plugins is empty. Talk to the native AdMob plugin directly through the injected bridge. */
+function getAdMob(){const C=window.Capacitor;if(!C)return null;
+ if(C.Plugins&&C.Plugins.AdMob)return C.Plugins.AdMob;
+ if(typeof C.nativePromise!=='function'||typeof C.addListener!=='function')return null;
+ return{initialize:o=>C.nativePromise('AdMob','initialize',o||{}),
+  prepareRewardVideoAd:o=>C.nativePromise('AdMob','prepareRewardVideoAd',o||{}),
+  showRewardVideoAd:o=>C.nativePromise('AdMob','showRewardVideoAd',o||{}),
+  addListener:async(ev,cb)=>C.addListener('AdMob',ev,cb)}}
 async function showAd(cb){
- const C=window.Capacitor,A=C&&C.Plugins&&C.Plugins.AdMob,nat=!!(C&&C.isNativePlatform&&C.isNativePlatform());
+ const C=window.Capacitor,A=getAdMob(),nat=!!(C&&C.isNativePlatform&&C.isNativePlatform());
  if(!nat||!A)return showAdFake(cb);
  if(_adBusy)return;_adBusy=1;
  let got=0;const hs=[];
@@ -3919,11 +3998,10 @@ async function showAd(cb){
  hs.forEach(h=>{try{h.remove()}catch(e){}});_adBusy=0;
  if(got)cb()}
 function showAdFake(cb){
- const o=document.createElement('div');o.style.cssText='position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,.85);z-index:99;display:grid;place-items:center;padding:20px';let n=5;
- o.innerHTML=`<div class="card" style="width:100%;max-width:340px;text-align:center"><b class="gold">📺 Sponsored</b><div class="mut" style="margin:8px 0">Ad placeholder. Connect a rewarded ad SDK (AdMob) inside showAd() to show real ads.</div><div class="big" id="adc">${n}</div><button class="btn" id="adx" disabled>Please wait…</button><button class="btn" id="adk">Close</button></div>`;
+ const o=document.createElement('div');o.style.cssText='position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,.85);z-index:99;display:grid;place-items:center;padding:20px';
+ o.innerHTML=`<div class="card" style="width:100%;max-width:340px;text-align:center"><b class="gold">📺 Ads</b><div class="mut" style="margin:12px 0">Ads and rewards are available only in the app.<br>Download the APK for a better experience.</div><button class="btn" id="adk">Close</button></div>`;
  document.body.appendChild(o);
- const t=setInterval(()=>{n--;const c=o.querySelector('#adc');if(c)c.textContent=Math.max(0,n);if(n<=0){clearInterval(t);const b=o.querySelector('#adx');b.disabled=false;b.className='btn g';b.textContent='Claim reward';b.onclick=()=>{o.remove();cb()}}},1000);
- o.querySelector('#adk').onclick=()=>{clearInterval(t);o.remove()}}
+ o.querySelector('#adk').onclick=()=>o.remove()}
 function adLeft(){fix();return S.adn.day===today()?Math.max(0,5-S.adn.n):5}
 function adCoins(from){if(adLeft()<=0){toast('Daily ad limit reached');return}
  showAd(()=>{const t=today();if(S.adn.day!==t)S.adn={day:t,n:0};S.adn.n++;S.coins+=5;save();toast('+5 coins');from=='store'?store():from=='daily'?daily():home()})}
@@ -4364,10 +4442,10 @@ function contracts(){
  if(!S.cx.list.length){const l=S.cx.lc;S.cx=null;save();return nextSeason(l)}
  const L=S.cx.list.map(u=>S.sq.findIndex(p=>p.uid==u));
  set(`<div class="logo" style="font-size:30px">📄 CONTRACTS</div><div class="sub">SEASON ${S.season} ENDS</div><div class="mut" style="margin-bottom:8px">These contracts expire. Extend them or let the players go. Squad ${S.sq.length}/${MAXSQ} · Cash $${S.cash.toFixed(1)}M</div>`+
- L.map(i=>{const p=S.sq[i];return `<div class="card"><div class="pl"><div style="min-width:0"><b class="nm">${esc(p.n)}</b><div style="margin-top:3px">${rolePill(p)}<span class="mut" style="font-size:12px">Age ${p.age} · POT ${p.pot}</span></div><div class="mut" style="font-size:12px">Current wage ${wf(p.sal)} / match</div></div><div class="ovr sm" style="border-color:${RAR(ovr(p))[1]}">${ovr(p)}</div></div>${optHtml(p,i,'cx')}<button class="btn" style="color:var(--red)" ${S.sq.length<=11||canLose(p)?'disabled':''} onclick="letGo(${i})">Let him go${S.sq.length<=11?' (squad minimum)':canLose(p)?' (required: '+canLose(p)+')':''}</button></div>`}).join('')+
+ L.map(i=>{const p=S.sq[i];return `<div class="card"><div class="pl"><div style="min-width:0"><b class="nm">${esc(p.n)}</b><div style="margin-top:3px">${rolePill(p)}<span class="mut" style="font-size:12px">Age ${p.age} · POT ${p.pot}</span></div><div class="mut" style="font-size:12px">Current wage ${wf(p.sal)} / match</div></div><div class="ovr sm" style="border-color:${RAR(ovr(p))[1]}">${ovr(p)}</div></div>${optHtml(p,i,'cx')}<button class="btn" style="color:var(--red)" ${!morRefuse(p)&&(S.sq.length<=11||canLose(p))?'disabled':''} onclick="letGo(${i})">Let him go${morRefuse(p)?' (he refuses to stay)':S.sq.length<=11?' (squad minimum)':canLose(p)?' (required: '+canLose(p)+')':''}</button></div>`}).join('')+
  `<button class="btn g" onclick="renewAll()">🔁 Extend everyone 1 season</button>`)}
 function renewAll(){const no=[];S.cx.list.slice().forEach(u=>{const p=S.sq.find(x=>x.uid==u);if(!p)return;if(morRefuse(p)){no.push(u);return}p.sal=offerFor(p,1).w;p.ct=1});S.cx.list=no;save();if(no.length)toast(no.length+' player'+(no.length>1?'s':'')+' refused to renew (morale too low)');contracts()}
-function letGo(i){if(S.sq.length<=11||canLose(S.sq[i]))return;if(S.sq[i].camp){toast('He is in the Training Camp. Extend his contract instead');return}const p=S.sq.splice(i,1)[0];S.offers=S.offers.filter(o=>o.u!=p.uid);if(S.cx)S.cx.list=S.cx.list.filter(u=>u!=p.uid);
+function letGo(i){if(!morRefuse(S.sq[i])&&(S.sq.length<=11||canLose(S.sq[i])))return;if(S.sq[i].camp){toast('He is in the Training Camp. Extend his contract instead');return}const p=S.sq.splice(i,1)[0];S.offers=S.offers.filter(o=>o.u!=p.uid);if(S.cx)S.cx.list=S.cx.list.filter(u=>u!=p.uid);
  toPool(p,-1);nws(`${p.n} left your club when his contract expired`,'me');S.teams[0].s=strength(S.sq);refreshStrengths();save();contracts()}
 /* ---------- injuries & fitness ---------- */
 const chem=()=>Math.min(3,Math.floor(Math.max(0,(S.dl||0)-5)/2));
@@ -4385,7 +4463,7 @@ function afterMatch(){const X=M.my.p,played=new Set(X),ov={};M.inj=[];morUpdate(
  S.sq.forEach(p=>{ext(p);if(p.inj>0)p.inj--;if(p.set>0)p.set--});
  X.forEach((p,k)=>{const o=ov[k]||0,im=trs(p).indexOf('im')>=0,kp=M.kpI>=0?k===M.kpI:p.role=='WK';
   p.str=Math.max(STR.floor,p.str-Math.round((STR.drain+(kp?STR.drainKeep:0)+o*STR.drainOver)*(im?.6:1)));
-  if(Math.random()<injP(p)*(im?.6:1)){const d=injure(p);M.inj.push({n:p.n,t:p.injT,d});ntf(`🤕 ${p.n} injured: ${p.injT}, out for ${d} round${d>1?'s':''}`)}});
+  if(Math.random()<injP(p)*(im?.6:1)){const d=injure(p);M.inj.push({n:p.n,t:p.injT,d});try{ilAdd(p,d)}catch(e){}ntf(`🤕 ${p.n} injured: ${p.injT}, out for ${d} round${d>1?'s':''}`)}});
  S.sq.forEach(p=>{p.str=Math.min(100,p.str+(played.has(p)?STR.recPlay:p.inj>0?STR.recInj:STR.recRest))});
  S.teams[0].s=strength(S.sq)}
 function injCard(){return M&&M.inj&&M.inj.length?`<div class="card" style="border-color:var(--red)"><b class="red">🤕 Injuries</b>${M.inj.map(x=>`<div class="pl" style="margin-top:6px"><span>${esc(x.n)}</span><span class="mut">${esc(x.t)} · ${x.d} round${x.d>1?'s':''}</span></div>`).join('')}</div>`:''}
@@ -5484,6 +5562,43 @@ function skin(){const app=document.getElementById('app');if(!app)return;
   s.nodes.forEach(n=>{if(n.classList.contains('card')&&n.classList.contains('mut')){const d=document.createElement('div');d.className='jxi';d.innerHTML=`<i>${c[2]}</i><span>${n.innerHTML}</span>`;el.appendChild(d)}else el.appendChild(n)});
   w.insertBefore(el,w.querySelector(':scope > .card'))});
  app.innerHTML='';app.appendChild(w)}
+})();
+</script>
+<script>
+/* ===== Update notice (optional, online-only, silent on failure) =====
+   Host a small file version.json: {"version":"1.1","url":"https://YOURNAME.itch.io/GAME","notes":"Bug fixes"}
+   Put its public link in UPDATE_JSON. Leave '' to disable. */
+(function(){
+const UPDATE_JSON='https://raw.githubusercontent.com/mname7652/Grand-Cricket-Manager/main/version.json';
+const GAME_PAGE='';
+function vnum(v){return String(v||'0').split('.').map(x=>parseInt(x,10)||0)}
+function newer(a,b){a=vnum(a);b=vnum(b);for(let i=0;i<Math.max(a.length,b.length);i++){const x=a[i]||0,y=b[i]||0;if(x!==y)return x>y}return false}
+function seen(){try{return localStorage.getItem('gcm_upd_seen')||''}catch(e){return ''}}
+function mark(v){try{localStorage.setItem('gcm_upd_seen',v)}catch(e){}}
+function show(d){
+ if(document.getElementById('updo'))return;
+ const link=d.url||GAME_PAGE,o=document.createElement('div');o.id='updo';
+ o.style.cssText='position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.72);padding:18px';
+ const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+ o.innerHTML='<div style="max-width:340px;width:100%;background:#12203a;border:1px solid #f5c542;border-radius:16px;padding:20px;text-align:center;color:#fff;font-family:system-ui,sans-serif;box-shadow:0 10px 40px rgba(0,0,0,.6)">'+
+ '<div style="font-size:34px">🚀</div><h3 style="margin:6px 0;color:#f5c542">Update Available</h3>'+
+ '<div style="font-size:14px;opacity:.85">Version '+esc(d.version)+' is out (you have '+esc(GAME_VERSION)+').</div>'+
+ (d.notes?'<div style="font-size:13px;opacity:.7;margin-top:8px;line-height:1.4">'+esc(d.notes)+'</div>':'')+
+ '<div style="display:flex;gap:10px;margin-top:16px"><button id="updl" style="flex:1;padding:11px;border:0;border-radius:10px;background:#f5c542;color:#222;font-weight:700">Get Update</button>'+
+ '<button id="updx" style="flex:1;padding:11px;border:1px solid #556;border-radius:10px;background:transparent;color:#fff">Later</button></div>'+
+ '<div style="font-size:11px;opacity:.5;margin-top:10px">Your saves stay safe when you install over the old version.</div></div>';
+ document.body.appendChild(o);
+ document.getElementById('updx').onclick=()=>{mark(d.version);o.remove()};
+ document.getElementById('updl').onclick=()=>{mark(d.version);if(link)window.open(link,'_blank');o.remove()};
+}
+function check(){
+ if(!UPDATE_JSON||!navigator.onLine||typeof GAME_VERSION==='undefined')return;
+ const ac=typeof AbortController!=='undefined'?new AbortController():null,t=setTimeout(()=>{try{ac&&ac.abort()}catch(e){}},6000);
+ fetch(UPDATE_JSON+(UPDATE_JSON.includes('?')?'&':'?')+'t='+Date.now(),{cache:'no-store',signal:ac?ac.signal:undefined})
+  .then(r=>r.ok?r.json():null).then(d=>{clearTimeout(t);if(d&&d.version&&newer(d.version,GAME_VERSION)&&seen()!==String(d.version))show(d)})
+  .catch(()=>{clearTimeout(t)});
+}
+setTimeout(check,4000);
 })();
 </script>
 </body></html>
