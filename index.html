@@ -164,11 +164,11 @@ h2{margin:8px 0}
 .thook div{padding:2px 0}
 @keyframes tpulse{50%{opacity:.6}}
 .pgr{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:12px 0 4px}.pgr button{min-width:38px;height:38px;border-radius:10px;border:1.5px solid #1e4fa0;background:#0d2450;color:#cfe0ff;font-weight:800;font-size:14px;cursor:pointer;padding:0 8px}.pgr button.on{background:linear-gradient(#ffd451,#e0a000);border-color:#ffd451;color:#2a1a00}.pgr button:disabled{opacity:.35}.pgr span{align-self:center;color:var(--mut);padding:0 2px}
-.coinwrap{position:relative;perspective:800px;height:340px;box-sizing:border-box;padding-bottom:30px;display:grid;place-items:end center;margin:0 0 4px;overflow:visible}.cspot{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 62% 52% at 50% 78%,rgba(255,226,130,.2),transparent 72%),radial-gradient(ellipse 30% 70% at 50% 40%,rgba(255,240,190,.07),transparent 80%)}.cshadow{position:absolute;left:50%;bottom:14px;width:130px;height:22px;margin-left:-65px;border-radius:50%;background:radial-gradient(ellipse,rgba(0,0,0,.6),transparent 70%);opacity:.55;z-index:0}.cring{position:absolute;left:50%;bottom:30px;width:150px;height:150px;margin-left:-75px;border-radius:50%;border:3px solid rgba(255,214,90,.9);opacity:0;pointer-events:none;z-index:0}.coin.fl~.cshadow{animation:cshad 2.2s linear forwards}.coin.fl~.cring{animation:cring .8s ease-out 1.7s both}@keyframes cshad{0%{transform:scale(1);opacity:.55}40%{transform:scale(.45);opacity:.18}78%{transform:scale(1);opacity:.55}88%{transform:scale(.85);opacity:.4}100%{transform:scale(1);opacity:.55}}@keyframes cring{0%{transform:scale(.7);opacity:.9}100%{transform:scale(2.2);opacity:0}}
+.coinwrap{position:relative;perspective:800px;height:340px;box-sizing:border-box;padding-bottom:30px;display:grid;place-items:end center;margin:0 0 4px;overflow:visible}.cspot{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 62% 52% at 50% 78%,rgba(255,226,130,.2),transparent 72%),radial-gradient(ellipse 30% 70% at 50% 40%,rgba(255,240,190,.07),transparent 80%)}.cshadow{position:absolute;left:50%;bottom:14px;width:130px;height:22px;margin-left:-65px;border-radius:50%;background:radial-gradient(ellipse,rgba(0,0,0,.6),transparent 70%);opacity:.55;z-index:0}.cring{position:absolute;left:50%;bottom:30px;width:150px;height:150px;margin-left:-75px;border-radius:50%;border:3px solid rgba(255,214,90,.9);opacity:0;pointer-events:none;z-index:0}.coin.fl~.cshadow{animation:cshad .8s linear forwards}.coin.fl~.cring{animation:cring .6s ease-out .6s both}@keyframes cshad{0%{transform:scale(1);opacity:.55}40%{transform:scale(.45);opacity:.18}78%{transform:scale(1);opacity:.55}88%{transform:scale(.85);opacity:.4}100%{transform:scale(1);opacity:.55}}@keyframes cring{0%{transform:scale(.7);opacity:.9}100%{transform:scale(2.2);opacity:0}}
 .coin{width:150px;height:150px;position:relative;z-index:2;transform-style:preserve-3d;--end:1800deg}.ce{position:absolute;inset:0;border-radius:50%;background:conic-gradient(#7a5200,#e2b030,#7a5200,#e2b030,#7a5200,#e2b030,#7a5200);transform:translateZ(var(--z))}
 .coin.idle{animation:tfloat 2.2s ease-in-out infinite}
 .coin.t{--end:1980deg}
-.coin.fl{animation:tflip 1.1s linear forwards}
+.coin.fl{animation:tflip .8s linear forwards}
 .cf{position:absolute;inset:0;border-radius:50%;display:grid;place-items:center;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:radial-gradient(circle at 35% 30%,#fff3b0,#f5c542 48%,#b8860b);border:6px solid #ffe680;box-shadow:inset 0 0 0 4px #b8860b,0 10px 26px rgba(0,0,0,.55);text-align:center}
 .cf{transform:translateZ(5px)}.cf.b{transform:rotateX(180deg) translateZ(5px)}
 .cf i{font-style:normal;font-size:62px;display:block;line-height:1}.cf b{font-size:14px;letter-spacing:2.5px;color:#6b4600;text-shadow:0 1px 0 rgba(255,255,255,.55)}.cf::before{content:"";position:absolute;inset:11px;border-radius:50%;border:2px dotted rgba(107,70,0,.5)}.cf::after{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;background:linear-gradient(115deg,transparent 34%,rgba(255,255,255,.4) 48%,transparent 62%)}
@@ -3014,7 +3014,27 @@ function xferHist(){const L=(S.xl||[]).slice().reverse(),B=L.filter(x=>x.b),Sl=L
  set(`${back()}<h2>📑 Transfer history</h2><div class="card">${tile('Total purchases',r1(sb))}${tile('Total sales',r1(ss))}${tile('Net balance',(net>=0?'+':'-')+r1(Math.abs(net)),net>=0?'grn':'red')}${tile('Average (per purchase)',B.length?r1(sb/B.length):'-')}${tile('Average (per sale)',Sl.length?r1(ss/Sl.length):'-')}${tile('Number of transfers',L.length)}</div>`+
  (L.length?L.map(x=>`<div class="card" style="border-color:${x.b?'var(--green)':'var(--red)'}"><div class="pl"><span class="mut" style="font-size:12px">Season ${x.sn} · Round ${x.rd}</span><b class="${x.b?'grn':'red'}">${x.b?'Bought':'Sold'}</b></div><div class="pl" style="margin-top:4px"><span style="min-width:0"><b>${esc(x.n)}</b><br><span class="mut" style="font-size:12px">${x.b?'From':'To'} ${esc(x.c)}</span></span><b class="gold">${x.f>0?'$'+x.f+'M':'Free'}</b></div></div>`).join(''):'<div class="card mut">No transfers yet. Players you buy or sell will be listed here. Deals made before this update are not recorded.</div>'))}
 function results(){
- set(`${back()}<h2>📋 Results</h2>`+(S.hist.length?S.hist.slice().reverse().slice(0,30).map(h=>`<div class="card" style="${h.u?'border-color:'+(h.won?'var(--green)':'var(--red)'):''}"><div class="mut">Season ${h.sn} · ${typeof h.rd=='number'?'Round '+h.rd:h.rd}</div>${esc(h.line)}</div>`).join(''):'<div class="card mut">No matches played yet. Play your first match from Home.</div>'))}
+ const css=`<style>.rpg{margin:0 0 6px}.rrh{display:flex;justify-content:space-between;align-items:center;margin:16px 4px 8px;font-size:12px;letter-spacing:.8px;text-transform:uppercase;color:#7f98c8;font-weight:800}.rrh b{color:#f5c542;font-size:13px}.rrh:first-child{margin-top:4px}
+.rm{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:6px;padding:12px 10px;margin-bottom:8px;border-radius:16px;border:1.5px solid #1d3b78;background:linear-gradient(160deg,#112a58,#0b1c3a)}
+.rm.w{border-color:#19c37d;box-shadow:0 0 12px rgba(25,195,125,.25);background:linear-gradient(160deg,#0d3b3a,#0b1c3a)}.rm.l{border-color:#ff4d6d;box-shadow:0 0 12px rgba(255,77,109,.2);background:linear-gradient(160deg,#3a1530,#0b1c3a)}
+.rt{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0;text-align:center;opacity:.62}.rt.win{opacity:1}
+.rt .crest{width:42px;height:46px;margin:0;filter:none}.rt span{font-size:12px;line-height:1.2;max-width:100%;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}.rt.win span{font-weight:800;color:#fff}
+.rt em{font-style:normal;font-size:20px;font-weight:900;font-family:Impact,'Arial Black',sans-serif;letter-spacing:1px;color:#cfe0ff}.rt.win em{color:#ffd451}
+.rv{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;font-weight:800;color:#5f7bb0}
+.rb{grid-column:1/-1;display:flex;justify-content:center;align-items:center;gap:8px;margin-top:2px;padding-top:7px;border-top:1px solid rgba(255,255,255,.08);font-size:12px;color:#cfe0ff}
+.rb i{font-style:normal;font-size:11px;font-weight:900;letter-spacing:.8px;padding:2px 9px;border-radius:8px}.rm.w .rb i{background:#19c37d;color:#04281a}.rm.l .rb i{background:#ff4d6d;color:#3a0716}</style>`;
+ const P=/^(.*?) (\d+(?:\/\d+)?) vs (.*?) (\d+(?:\/\d+)?) — (.*)$/;
+ const team=(n,sc,win)=>`<div class="rt${win?' win':''}">${crest(n,'#1c8a4c')}<span>${esc(n)}</span><em>${sc}</em></div>`;
+ const card=h=>{const m=String(h.line).match(P);if(!m)return `<div class="card">${esc(h.line)}</div>`;
+  const[,a,sa,b,sb,res]=m,tie=/tied/i.test(res),wa=!tie&&res.indexOf(a)===0,wb=!tie&&!wa;
+  const note=res.replace(/^.*? won\b\s*/,'').replace(/^\W+/,'');
+  const you=h.u?(h.won?'w':tie?'':'l'):'';
+  const tail=h.u?`<div class="rb"><span>${tie?'Match tied':esc(note?(h.won?'Won ':'Lost ')+note:(h.won?'You won':'You lost'))}</span><i>${tie?'TIE':h.won?'WIN':'LOSS'}</i></div>`:'';
+  return `<div class="rm ${you}">${team(a,sa,wa)}<div class="rv">VS</div>${team(b,sb,wb)}${tail}</div>`};
+ if(!S.hist.length)return set(`${back()}<h2>📋 Results</h2><div class="card mut">No matches played yet. Play your first match from Home.</div>`);
+ const L=S.hist.slice().reverse().slice(0,40);let out='',cur='';
+ L.forEach(h=>{const k=h.sn+'|'+h.rd;if(k!==cur){cur=k;out+=`<div class="rrh"><span>${typeof h.rd=='number'?'Round '+h.rd:esc(String(h.rd))}</span><b>Season ${h.sn}</b></div>`}out+=card(h)});
+ set(`${back()}<h2>📋 Results</h2>${css}<div class="rpg">${out}</div>`)}
 function renameClub(){ginput('New club name',S.club,x=>{const v=(x||'').trim().slice(0,28);if(!v||v==S.club)return;if(S.teams.some(t=>t.name==v)){toast('That name is already used in your league');return}
  const o=S.club;S.tbl[v]=S.tbl[o];delete S.tbl[o];S.teams[0].name=v;S.club=v;try{crkRename(o,v)}catch(e){}S.wc=null;save();toast('Club renamed');clubStatus()},28)}
 function logoEdit(){set(`${back('clubStatus()')}<h2>🎨 Club logo</h2><div class="card">${logoPicker(S.logo,'editLogo',S.club)}</div>`)}
@@ -3026,7 +3046,6 @@ function clubStatus(){
  act=(c,ic,bg,tt,sub,fn,cls)=>`<button class="cac${cls?' '+cls:''}" style="--c:${c}" onclick="${fn}"><div class="bgi">${I[bg]}</div><div class="ic">${I[ic]}</div><div class="tx"><b>${tt}</b></div><span class="ch">›</span></button>`;
  set(`<div class="csh"><button class="bk" onclick="home()">‹</button>${I.crown}<div class="ln"><span></span><h1>Club <b>Status</b></h1><span></span></div></div>
  <div class="csb"><div class="cr">${crestL(S.logo,S.club,0)}<div class="leg">Build Your Legacy</div></div><div class="ci"><h2>Club Status</h2>${row('users','Squad strength',strength(S.sq))}${row('cal','Season record',t.w+'W '+t.l+'L '+t.t+'T')}${row('cash','Cash','$'+S.cash.toFixed(1)+'M')}${row('shield','Reputation',S.rep)}${row('star','Club value',(()=>{try{const m=crkMet(S.club),sc=cvScore(m);return sc+'/100 · '+cvFans(sc)+'M fans'}catch(e){return '-'}})())}${row('star','Star player',esc(best.n)+' ('+ovr(best)+')')}</div></div>
- ${act('#2a9bff','list','cup','Results','View match results &amp; performance','results()')}
  ${act('#14b8c4','list','cup','Club statistics','Your club players: runs, wickets, all seasons','clubStatsOpen()')}
  ${act('#f5a623','medal','laurel','Record book','Team records and Man of the Match log','clubRecs()')}
  ${act('#2a9bff','cal','cup','Season review','Review any season of your club','seasonReviews()')}
@@ -3803,12 +3822,12 @@ function callToss(c){if(!M||M.stage!=='toss'||M.tc2)return;M.tc2=1;const res=Mat
  const coin=document.getElementById('coin');if(coin)coin.className='coin fl'+(res=='T'?' t':'');
  ['H','T'].forEach(k=>{const b=document.getElementById('tc'+k);if(b){b.disabled=true;if(k==c)b.classList.add('sel')}});
  const t=document.getElementById('tsub');if(t)t.textContent='You called '+(c=='H'?'HEADS':'TAILS')+'...';
- setTimeout(()=>tossResult(res),1200)}
+ setTimeout(()=>tossResult(res),850)}
 function tossResult(res){if(!M||M.stage!=='toss')return;const nm=res=='H'?'HEADS':'TAILS',rec=M.dew?'bowl':'bat',t=document.getElementById('tsub');if(M.tUw){try{SFX.cheer(.4)}catch(e){}try{confetti(60)}catch(e){}}if(t)t.textContent='It landed on '+nm+'.';
  const ch=(ic,ttl,txt,ub,r)=>`<div class="tch" onclick="begin(${ub})"><div class="ti">${ic}</div><div style="flex:1;min-width:0"><b style="font-size:17px">${ttl}</b><div class="mut" style="font-size:12.5px;margin-top:2px">${txt}</div></div>${r?'<span class="rec">Best</span>':'<span class="mut" style="font-size:22px">›</span>'}</div>`;
  const h=M.tUw?`<div class="tres win"><h3>You won the toss!</h3><div class="mut">What do you want to do?</div><div class="rs">IT LANDED ON ${nm}</div></div>${ch('🏏','Bat first','Put a total on the board and build pressure.',true,rec=='bat')}${ch('🎯','Bowl first','Chase the target and know the run rate.',false,rec=='bowl')}<div class="mut" style="text-align:center;font-size:13px">${M.dew?'💧 Dew helps the chasing side.':'☀️ No dew, so setting a total is safer.'}</div>`
  :`<div class="tres lose"><h3>${esc(M.opp.name)} won the toss</h3><div class="mut">They chose to ${M.tBf?'bat':'bowl'} first.</div><div class="rs">IT LANDED ON ${nm}</div></div><button class="btn g blink tgo" onclick="begin(${!M.tBf})">▶ Start match</button>`;
- const r=document.getElementById('tres');if(r){r.innerHTML=h;r.scrollIntoView({behavior:'smooth',block:'nearest'})}}
+ const r=document.getElementById('tres');if(r){r.innerHTML=h;r.scrollIntoView({block:'nearest'})}}
 function begin(ub){SFX.crowdStart();try{toast('📺 Live on '+tvOf().n)}catch(e){}M.inn[0]=ub?newInn(M.my,M.opp,true):newInn(M.opp,M.my,false);M.tc=M.tc||{};M.stage='play';M.tab='v';M.pz=false;M.pick=null;M.fast=0;SFX.ev('welcome',false,{f:1,d:.4});tmStart(Math.max(0,Math.round(SFX.remaining()*1000+400-TMD[0])));render();window.scrollTo(0,0)}
 function setA(v){M.atk=v;render()}function setB(v){M.bwa=v;render()}
 function pickB(i){M.inn[M.i].cb=i;render()}
