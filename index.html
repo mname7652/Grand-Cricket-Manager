@@ -2733,7 +2733,12 @@ function switchClub(nk,ph){
  const nb=S.cb[ci]!==undefined?S.cb[ci]:pf.bud;delete S.cb[ci];
  const oldTeam=S.teams[0];
  S.crep=S.crep||{};S.crep[ok]=S.rep;S.arep=S.arep||{};S.arep[ok]=S.rep;S.sq=sq;S.club=nk;S.orig=nk;S.rep=S.arep[nk]!==undefined?S.arep[nk]:(S.crep[nk]!==undefined?S.crep[nk]:pf.rep);delete S.arep[nk];S.country=pf.country;S.tier=eT(nk);S.div=clubDiv(nk);S.std=pf.std;S.cap=pf.cap;S.logo={...pf.logo};
- S.cash=Math.max(30,Math.round(nb));S.lc=S.cash;S.balV=5;S.lv={scout:1,acad:1,stad:1};S.spon=null;S.sponTv=null;S.sOff=null;S.scouted=[];S.acad=genAcad();
+ S.cash=Math.max(30,Math.round(nb));S.lc=S.cash;S.balV=5;/* upgrades belong to the CLUB: leave them with the old club, take over the new club's levels */
+ S.al=S.al||{};S.cfc=S.cfc||{};S.cac=S.cac||{};
+ S.al[oi]={scout:(S.lv&&S.lv.scout)||1,acad:(S.lv&&S.lv.acad)||1,stad:(S.lv&&S.lv.stad)||1};S.cfc[oi]={...(S.fac||{})};S.cac[oi]=S.acad||[];
+ S.lv={scout:1,acad:1,stad:1,...(S.al[ci]||{})};delete S.al[ci];S.fac={...(S.cfc[ci]||{})};delete S.cfc[ci];
+ const nac=S.cac[ci];delete S.cac[ci];
+ S.spon=null;S.sponTv=null;S.sOff=null;S.scouted=[];S.acad=(nac&&nac.length)?nac:genAcad();
  S.offers=[];S.cool={};S.dl=0;S.hype={};S.wt=null;
  S.bc=60;S.bh=[];S.jap={};S.jp=null;S.jsc=null;S.jo={sn:ns,list:[]};S.jv={sn:ns,list:(S.jv?S.jv.list:[]).filter(k=>k!==nk&&k!==ok)};
  divRebuild();S.teams[0].s=strength(S.sq);refreshStrengths();S.teams[0].s=strength(S.sq);
