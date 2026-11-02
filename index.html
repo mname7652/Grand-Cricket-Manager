@@ -1034,10 +1034,29 @@ select{width:100%;padding:11px 8px;border-radius:10px;border:1.5px solid var(--l
   for(i=1;i<z.length;i++){c=z.charCodeAt(i);e=c<n?d[c]:p+p.charAt(0);o.push(e);if(n<MAX)d[n++]=p+e.charAt(0);p=e}
   return decodeURIComponent(escape(o.join('')))}
  var S=Storage.prototype,g=S.getItem,s=S.setItem,K=/^gcm_save\d*$/,P={},T=null;
- function flush(){T=null;try{window.__saveNow&&window.__saveNow()}catch(e){}for(var k in P){var v=P[k];delete P[k];try{s.call(localStorage,k,v)}catch(e0){try{s.call(localStorage,k,MK+lzc(v))}catch(e){try{if(typeof toast==='function')toast('⚠️ Could not save! Storage may be full or blocked. Your progress may be lost.')}catch(x){}}}}}
+ function isZ(v){return !!v&&v.charAt(0)==='\u0001'&&v.charAt(1)==='Z'}
+ function zip(v){try{return MK+lzc(v)}catch(e){return null}}
+ /* squeeze every other raw save slot into compressed form to free up quota */
+ function squeeze(skip){try{for(var i=0;i<localStorage.length;i++){var kk=localStorage.key(i);if(kk&&kk!==skip&&K.test(kk)){var o=g.call(localStorage,kk);if(o&&!isZ(o)){var z=zip(o);if(z&&z.length<o.length){try{s.call(localStorage,kk,z)}catch(e){}}}}}}catch(e){}}
+ /* last-resort backup: IndexedDB (much bigger quota). FB holds values that did not fit in localStorage */
+ var FB={},DB=null;
+ function idb(cb){try{if(DB)return cb(DB);var q=indexedDB.open('gcm_fb',1);q.onupgradeneeded=function(){q.result.createObjectStore('kv')};q.onsuccess=function(){DB=q.result;cb(DB)};q.onerror=function(){cb(null)}}catch(e){cb(null)}}
+ function idbSet(k,v,done){idb(function(d){if(!d)return done&&done(0);try{var tx=d.transaction('kv','readwrite');tx.objectStore('kv').put(v,k);tx.oncomplete=function(){done&&done(1)};tx.onerror=tx.onabort=function(){done&&done(0)}}catch(e){done&&done(0)}})}
+ function idbDel(k){idb(function(d){try{d&&d.transaction('kv','readwrite').objectStore('kv').delete(k)}catch(e){}})}
+ idb(function(d){if(!d)return;try{var r=d.transaction('kv','readonly').objectStore('kv').openCursor();r.onsuccess=function(){var c=r.result;if(c){if(FB[c.key]===undefined&&K.test(c.key))FB[c.key]=c.value;c.continue()}}}catch(e){}});
+ try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+ function put(k,v){var z=zip(v),zz=z||v;
+  try{s.call(localStorage,k,zz);if(FB[k]!==undefined){delete FB[k];idbDel(k)}return 1}catch(e){}
+  squeeze(k);
+  try{s.call(localStorage,k,zz);if(FB[k]!==undefined){delete FB[k];idbDel(k)}return 1}catch(e){}
+  /* localStorage is full or blocked: keep the save in IndexedDB (and memory) instead */
+  FB[k]=zz;idbSet(k,zz,function(ok){if(!ok&&FB[k]===zz&&!window.__fbWarn){window.__fbWarn=1;try{if(typeof toast==='function')toast('⚠️ Could not save! Storage may be full or blocked. Your progress may be lost.')}catch(x){}}});
+  return 1}
+ function flush(){T=null;try{window.__saveNow&&window.__saveNow()}catch(e){}for(var k in P){var v=P[k];delete P[k];put(k,v)}}
+ setTimeout(function(){squeeze('')},4000);
  S.setItem=function(k,v){if(this===localStorage&&K.test(k)&&typeof v==='string'){P[k]=v;if(!T)T=setTimeout(flush,400);return}return s.call(this,k,v)};
- S.getItem=function(k){if(this===localStorage&&K.test(k)){try{window.__saveNow&&window.__saveNow()}catch(e){}}if(this===localStorage&&K.test(k)&&P[k]!==undefined)return P[k];var v=g.call(this,k);if(v&&K.test(k)&&v.charAt(0)==='\u0001'&&v.charAt(1)==='Z'){try{return lzd(v.slice(2))}catch(e){return null}}return v};
- S.removeItem=(function(r){return function(k){if(this===localStorage&&K.test(k))delete P[k];return r.call(this,k)}})(S.removeItem);
+ S.getItem=function(k){if(this===localStorage&&K.test(k)){try{window.__saveNow&&window.__saveNow()}catch(e){}}if(this===localStorage&&K.test(k)&&P[k]!==undefined)return P[k];var v=(this===localStorage&&K.test(k)&&FB[k]!==undefined)?FB[k]:g.call(this,k);if(v&&K.test(k)&&v.charAt(0)==='\u0001'&&v.charAt(1)==='Z'){try{return lzd(v.slice(2))}catch(e){return null}}return v};
+ S.removeItem=(function(r){return function(k){if(this===localStorage&&K.test(k)){delete P[k];if(FB[k]!==undefined){delete FB[k];idbDel(k)}}return r.call(this,k)}})(S.removeItem);
  addEventListener('pagehide',flush);document.addEventListener('visibilitychange',function(){if(document.hidden)flush()});
  window.__lz={c:lzc,d:lzd};
 }catch(e){}})();
@@ -4454,21 +4473,26 @@ function getAdMob(){const C=window.Capacitor;if(!C)return null;
   prepareRewardVideoAd:o=>C.nativePromise('AdMob','prepareRewardVideoAd',o||{}),
   showRewardVideoAd:o=>C.nativePromise('AdMob','showRewardVideoAd',o||{}),
   addListener:async(ev,cb)=>C.addListener('AdMob',ev,cb)}}
+function adErr(e){try{let m=(e&&(e.message||e.errorMessage||e.code))||String(e||'');m=String(m).replace(/\s+/g,' ').slice(0,70);return m}catch(x){return''}}
 async function showAd(cb){
  const C=window.Capacitor,A=getAdMob(),nat=!!(C&&C.isNativePlatform&&C.isNativePlatform());
  if(!nat||!A)return showAdFake(cb);
  if(_adBusy)return;_adBusy=1;
- let got=0;const hs=[];
+ let got=0,failMsg='';const hs=[];
  try{
   if(!_adInit){await A.initialize({initializeForTesting:ADMOB_TEST});_adInit=1}
   let fin;const done=new Promise(r=>fin=r);
   hs.push(await A.addListener('onRewardedVideoAdReward',()=>{got=1}));
   hs.push(await A.addListener('onRewardedVideoAdDismissed',()=>fin()));
-  hs.push(await A.addListener('onRewardedVideoAdFailedToShow',()=>fin()));
-  await A.prepareRewardVideoAd({adId:ADMOB_REWARDED,isTesting:ADMOB_TEST});
+  hs.push(await A.addListener('onRewardedVideoAdFailedToShow',(x)=>{failMsg='failed to show '+adErr(x);fin()}));
+  let lastE=null,ok=0;
+  for(let i=0;i<2&&!ok;i++){/* one automatic retry: a fresh ad request often fills on the second try */
+   try{await A.prepareRewardVideoAd({adId:ADMOB_REWARDED,isTesting:ADMOB_TEST});ok=1}catch(e){lastE=e;if(i==0)await new Promise(r=>setTimeout(r,2000))}}
+  if(!ok)throw lastE||new Error('no ad loaded');
   await A.showRewardVideoAd();
-  await done;
- }catch(e){toast('Ad not available right now. Try again in a minute.')}
+  await Promise.race([done,new Promise(r=>setTimeout(r,240000))]);/* never hang forever */
+  if(!got&&failMsg)toast('Ad could not be shown ('+failMsg+'). Try again.')
+ }catch(e){_adInit=_adInit&&!/initializ/i.test(adErr(e));toast('Ad not available right now ('+adErr(e)+'). Try again in a minute.')}
  hs.forEach(h=>{try{h.remove()}catch(e){}});_adBusy=0;
  if(got)cb()}
 function showAdFake(cb){
